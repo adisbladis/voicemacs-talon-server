@@ -5,9 +5,8 @@ from typing import Optional, List
 import threading
 import time
 import logging
-from user.utils import context_active
 from user.utils.key_value_store import KeyValueStore
-from talon import ui, cron, Module, app, Context, scope
+from talon import cron, Module, app, Context, scope
 import platform
 import os
 
@@ -178,8 +177,8 @@ def _connect() -> None:
             _authenticate(auth_key)
             app.notify("Talon", "Voicemacs connected")
             LOGGER.info("Voicemacs authenticated. Ready to communicate with Emacs.")
-    except:
-        actions.user.notify("Talon", "Voicemacs failed to connect.", deadzone=5.0)
+    except Exception:
+        app.notify("Talon", "Voicemacs failed to connect.", deadzone=5.0)
         _force_disconnect()
 
 
@@ -198,7 +197,7 @@ def _try_connect():
     with _socket_lock:
         # TODO: Something closer to `emacs_context.matches`
         if emacs_focussed() and not _socket:
-            LOGGER.debug(f"Emacs active & no socket. Trying to connect.")
+            LOGGER.debug("Emacs active & no socket. Trying to connect.")
             try:
                 _connect()
                 LOGGER.debug(f"Voicemacs connection successful: {_socket}")
@@ -226,7 +225,7 @@ def _receive_until_closed(s: socket.socket) -> None:
                     except Exception as e:
                         # TODO: Error handling for broken handler?
                         LOGGER.info(f'Unexpected error handling message: "{e}"')
-                remaining_chunk = remaining_chunk[next_terminator.end() :]
+                remaining_chunk = remaining_chunk[next_terminator.end():]
             # If there's an unfinished message, store it for subsequent chunks.
             message_so_far += remaining_chunk
     except Exception as e:
@@ -250,11 +249,11 @@ def _force_disconnect(*_, **__):
                 # TODO: Could this sometimes fail?
                 try:
                     _socket.shutdown(socket.SHUT_RDWR)
-                except:
+                except Exception:
                     pass
                 _socket.close()
                 _socket = None
-    except:
+    except Exception:
         pass
     finally:
         app.notify("Talon", "Voicemacs disconnected")
@@ -265,7 +264,7 @@ def _handle_message(s, message_string):
 
     try:
         message = json.loads(message_string)
-    except:
+    except Exception:
         _send(
             _make_error(
                 None,
@@ -424,7 +423,6 @@ def _send_request(type_: str, data: dict) -> DeferredResult:
     with _pending_lock:
         # This will be used by the receiver to set the deferred result & invoke
         # the callback.
-        nonce = _outgoing_nonce
         _outgoing_nonce += 1
         _pending_requests[_outgoing_nonce] = deferred
     _send(_make_request(_outgoing_nonce, type_, data))
@@ -440,7 +438,7 @@ def _send(message: dict):
         encoded_message = message_str.encode()
         try:
             _socket.sendall(encoded_message)
-        except Exception as e:
+        except Exception:
             _force_disconnect()
 
 
@@ -459,7 +457,7 @@ def _ping():
                     # TODO: What if the second half of a message gets dropped, will
                     #   this still work?
                     _socket.sendall("\0\1\0".encode())
-            except:
+            except Exception:
                 # Seems like even with this, sometimes the receive thread D/C isn't
                 # triggered. Just force it.
                 _force_disconnect()
