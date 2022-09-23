@@ -1,12 +1,21 @@
 import socket
 import re
 import json
-from typing import Optional, List
+from typing import (
+    Optional,
+    List,
+    Dict,
+)
 import threading
 import time
 import logging
-from user.utils.key_value_store import KeyValueStore
-from talon import cron, Module, app, Context, scope
+from talon import (  # type: ignore
+    cron,
+    Module,
+    app,
+    Context,
+    scope,
+)
 import platform
 import os
 
@@ -20,8 +29,8 @@ import os
 LOGGER = logging.getLogger()
 LOGGER.setLevel(logging.INFO)
 
-# Holds various keys & values passed to us by Voicemacs.
-emacs_state = KeyValueStore()
+# # Holds various keys & values passed to us by Voicemacs.
+# emacs_state = KeyValueStore()
 
 
 # Interval between connection attempts, in ms
@@ -36,14 +45,14 @@ _RE_TERMINATION_CHAR = re.compile("\0")
 _outgoing_nonce = 1
 
 _receive_thread = None
-_socket = None
+_socket: socket.socket = None  # type: ignore
 _socket_lock = threading.RLock()
 
 emacs_context = Context()
 emacs_context.matches = "tag: user.emacs"
 
 # Maps request nonces to their `_DeferredResult`
-_pending_requests = {}
+_pending_requests: Dict = {}
 # TODO: Simplify locking scheme? Do we need two locks?
 _pending_lock = threading.Lock()
 
@@ -303,12 +312,12 @@ def _handle_message(s, message_string):
         )
 
 
-def _handle_request(nonce: Optional[int], type_: str, data: dict):
+def _handle_request(nonce: Optional[int], type_: str, data: Dict):
     if type_ == "update":
         try:
             key = data["key"]
             value = data["value"]
-            emacs_state.update({key: value})
+            # emacs_state.update({key: value})
         except Exception as e:
             _send(
                 _make_error(
@@ -327,7 +336,7 @@ def _handle_request(nonce: Optional[int], type_: str, data: dict):
         )
 
 
-def _handle_response(nonce: Optional[int], type_: str, data: dict):
+def _handle_response(nonce: Optional[int], type_: str, data: Dict):
     # TODO: Timeout on callback? So it won't be called if the response comes in
     #   after the timeout.
     with _pending_lock:
