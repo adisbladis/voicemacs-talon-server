@@ -3,8 +3,8 @@ import time
 
 from talon import Module, actions
 
-from user.emacs.utils import voicemacs
-from user.emacs.utils.voicemacs import emacs_state
+from user.voicemacs import voicemacs
+from user.voicemacs.voicemacs import emacs_state
 
 
 key = actions.key

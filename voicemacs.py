@@ -1,3 +1,4 @@
+from user.voicemacs.utils.key_value_store import KeyValueStore
 import socket
 import re
 import json
@@ -30,8 +31,7 @@ LOGGER = logging.getLogger()
 LOGGER.setLevel(logging.INFO)
 
 # # Holds various keys & values passed to us by Voicemacs.
-# emacs_state = KeyValueStore()
-
+emacs_state = KeyValueStore()
 
 # Interval between connection attempts, in ms
 _CONNECT_ATTEMPT_INTERVAL = 1000
@@ -317,7 +317,7 @@ def _handle_request(nonce: Optional[int], type_: str, data: Dict):
         try:
             key = data["key"]
             value = data["value"]
-            # emacs_state.update({key: value})
+            emacs_state.update({key: value})
         except Exception as e:
             _send(
                 _make_error(
