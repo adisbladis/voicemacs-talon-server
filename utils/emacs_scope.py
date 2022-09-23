@@ -2,7 +2,7 @@ import threading
 from copy import copy
 from collections import defaultdict
 
-from user.utils import Hook
+from user.voicemacs.utils import Hook
 
 
 class KeyValueStore:
