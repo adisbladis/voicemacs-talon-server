@@ -28,7 +28,7 @@ import os
 
 
 LOGGER = logging.getLogger()
-LOGGER.setLevel(logging.INFO)
+LOGGER.setLevel(logging.DEBUG)
 
 # # Holds various keys & values passed to us by Voicemacs.
 emacs_state = KeyValueStore()
@@ -147,11 +147,6 @@ def _get_temp_folder():
 _TEMP_FOLDER = _get_temp_folder()
 
 
-def emacs_focussed():
-    """Is Emacs focussed?"""
-    return "user.emacs" in scope.get("tag", [])
-
-
 # TODO: Not happy with the threading model here. It's super messy.
 
 
@@ -205,7 +200,7 @@ def _try_connect():
     # TODO: Is this a reasonable check? `_socket` being None is not great info.
     with _socket_lock:
         # TODO: Something closer to `emacs_context.matches`
-        if emacs_focussed() and not _socket:
+        if not _socket:
             LOGGER.debug("Emacs active & no socket. Trying to connect.")
             try:
                 _connect()
@@ -459,7 +454,7 @@ def _ping():
 
     """
     with _socket_lock:
-        if emacs_focussed() and _socket:
+        if _socket:
             try:
                 # TODO: Why pending lock here
                 with _pending_lock:
