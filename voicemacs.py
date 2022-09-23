@@ -234,7 +234,7 @@ def _receive_until_closed(s: socket.socket) -> None:
                     except Exception as e:
                         # TODO: Error handling for broken handler?
                         LOGGER.info(f'Unexpected error handling message: "{e}"')
-                remaining_chunk = remaining_chunk[next_terminator.end():]
+                remaining_chunk = remaining_chunk[next_terminator.end() :]
             # If there's an unfinished message, store it for subsequent chunks.
             message_so_far += remaining_chunk
     except Exception as e:

@@ -1,10 +1,10 @@
 from typing import List, Optional, Union
 import time
 
-from talon import Module, actions
+from talon import Module, actions  # type: ignore
 
-from user.voicemacs import voicemacs
-from user.voicemacs.voicemacs import emacs_state
+from user.voicemacs import voicemacs  # type: ignore
+from user.voicemacs.voicemacs import emacs_state  # type: ignore
 
 
 key = actions.key

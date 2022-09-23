@@ -1,8 +1,8 @@
 import logging
 
-from talon import Module
+from talon import Module  # type: ignore
 
-from user.emacs.utils.voicemacs import emacs_state
+from user.voicemacs.voicemacs import emacs_state  # type: ignore
 
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.INFO)

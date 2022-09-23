@@ -48,5 +48,5 @@ class Hook(object):
         for func in functions_copy:
             try:
                 func(*args, **kwargs)
-            except Exception as e:
-                logging.exception(f"Error running hooked function")
+            except Exception:
+                logging.exception("Error running hooked function")
